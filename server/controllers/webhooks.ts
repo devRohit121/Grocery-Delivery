@@ -3,13 +3,16 @@ import Stripe from 'stripe';
 import { prisma } from "../config/prisma.js";
 import { inngest } from "../inngest/index.js";
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+let stripe: Stripe | null = null;
 
-if (!stripeSecretKey) {
-    throw new Error("STRIPE_SECRET_KEY is missing from environment variables");
-}
-
-const stripe = new Stripe(stripeSecretKey);
+export const getStripe = () => {
+  if (!stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) throw new Error("STRIPE_SECRET_KEY is missing");
+    stripe = new Stripe(key);
+  }
+  return stripe;
+};
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -19,7 +22,7 @@ export const stripeWebhook = async (request: Request, response: Response) => {
     // Get the signature sent by Stripe
     const signature = request.headers['stripe-signature'];
     try {
-      event = stripe.webhooks.constructEvent(
+      event = stripe?.webhooks.constructEvent(
         request.body,
         signature as string,
         endpointSecret
@@ -42,11 +45,11 @@ export const stripeWebhook = async (request: Request, response: Response) => {
       const paymentIntentId = paymentIntent.id;
 
       // Getting Session Metadata
-      const session = await stripe.checkout.sessions.list({
+      const session = await stripe?.checkout.sessions.list({
         payment_intent: paymentIntentId
       })
 
-      const {orderId} = session.data[0].metadata as any;
+      const {orderId} = session?.data[0].metadata as any;
 
       // Mark payemnt as paid
 
@@ -81,11 +84,11 @@ export const stripeWebhook = async (request: Request, response: Response) => {
         const paymentIntentFailureId = paymentIntentFailure.id;
 
         // Getting session metadata
-        const sessionFailure = await stripe .checkout.sessions.list({
+        const sessionFailure = await stripe?.checkout.sessions.list({
             payment_intent: paymentIntentFailureId
         })
 
-        const failureOderId = (sessionFailure.data[0].metadata as any).orderId;
+        const failureOderId = (sessionFailure?.data[0].metadata as any).orderId;
 
         await prisma.order.delete({where: {id: failureOderId}})
     }

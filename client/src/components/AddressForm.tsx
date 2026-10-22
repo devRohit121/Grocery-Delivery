@@ -1,4 +1,4 @@
-import { X, XIcon } from "lucide-react"
+import { XIcon } from "lucide-react"
 
 const AddressForm = ({resetForm, handleSubmit, form, setForm, editingId} : any) => {
   return (

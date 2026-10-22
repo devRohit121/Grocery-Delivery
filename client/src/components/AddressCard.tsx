@@ -1,4 +1,4 @@
-import { CheckIcon, MapPinIcon, PencilIcon, Trash2, Trash2Icon } from "lucide-react";
+import { CheckIcon, MapPinIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import type { Address } from "../types"
 import api from "../config/api";
 import { userAuth } from "../context/authContext";

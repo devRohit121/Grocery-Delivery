@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowLeftIcon,
   CheckIcon,
@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 
 import { useCart } from "../context/CartContext";
-import { dummyAddressData } from "../assets/assets";
 import type { Address } from "../types";
 
 import CheckoutAddress from "../components/Checkout/CheckoutAddress";
