@@ -56,7 +56,7 @@ export const createDeliveryPartner = async (req: Request, res: Response) => {
 }
 
 
-// update delivery partner
+// update delivery partner profile
 
 export const updateDeliveryPartner = async (req: Request, res: Response) => {
     const {name, phone, vehicleType, isActive} = req.body;
@@ -65,7 +65,7 @@ export const updateDeliveryPartner = async (req: Request, res: Response) => {
     if(name) data.name = name;
     if(phone) data.phone = phone;
     if(vehicleType) data.vehicleType = vehicleType;
-    if(isActive) data.isActive = isActive;
+    data.isActive = isActive;
 
     try {
         const partner = await prisma.deliveryPartner.update({

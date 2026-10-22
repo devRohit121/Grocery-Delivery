@@ -10,8 +10,11 @@ import { inngest, functions } from "./inngest/index.js"
 import addressRouter from "./routes/addressRoutes.js";
 import adminRouter from "./routes/adminRoutes.js";
 import deliveryPartnerRouter from "./routes/deliveryPartnerRoutes.js";
+import { stripeWebhook } from "./controllers/webhooks.js";
 
 const app = express();
+
+app.post("/api/stripe", express.raw({type: 'application/json'}), stripeWebhook);
 
 // Middleware
 app.use(cors())
@@ -42,4 +45,10 @@ app.use((error: any, req: Request, res: Response, next: NextFunction)=> {
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
+});
+
+console.log({
+    cloudName: !!process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: !!process.env.CLOUDINARY_API_KEY,
+    apiSecret: !!process.env.CLOUDINARY_API_SECRET,
 });

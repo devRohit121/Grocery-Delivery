@@ -1,8 +1,8 @@
 
 import { Request, Response } from "express";
 import { prisma } from "../config/prisma.js";
-import { timeStamp } from "node:console";
 import { inngest } from "../inngest/index.js";
+import Stripe from 'stripe';
 
 // Create Order
 // POST  /api/orders
@@ -59,19 +59,42 @@ export const createOrder = async(req: Request, res: Response) => {
             deliveryFee,
             tax,
             total,
-            statusHistory: [{status: "Placed", note: "Order placed successfully", timestamp: new Date()}]
+            statusHistory: [{status: "Placed", note: "Order placed successfully", timeStamp: new Date()}]
         }
     })
 
     if (paymentMethod === "card") {
-        // stripe payment link
+
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+
+        // create session
+        const session = await stripe.checkout.sessions.create({
+        success_url: '${req.headers.origin}/orders?clearCart=true',
+        cancel_url: '${req.headers.origin}/checkout',
+        line_items: [
+            {
+            price_data: {
+                currency: "usd",
+                product_data: {
+                    name: "Payment Groceries"
+                },
+                unit_amount: Math.round(total * 100);
+            },
+            quantity: 1,
+            },
+        ],
+        mode: 'payment',
+        metadata: {orderId: order.id}
+    });
+
+    return res.json({url: session.url})
 
     }
 
     res.json({order})
 
     // Decrease stock
-    for (const item of items) {
+    for (const item of orderItems) {
         await prisma.product.update({
             where: {id: item.product},
             data: {stock: {decrement: item.quantity}}

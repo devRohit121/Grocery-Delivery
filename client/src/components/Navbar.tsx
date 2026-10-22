@@ -2,10 +2,11 @@ import { ArrowUpRightIcon, BikeIcon, ChevronDownIcon, LogOutIcon, MapPinIcon, Me
 import React, { useState } from "react";
 import { Link   , useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { userAuth } from "../context/authContext";
 
 const Navbar = () => {
 
-    const user: any = {name: "Rohit Gupta", email: "john@example.com", isAdmin: true}
+    const {user, logout} = userAuth();
     const {cartCount, setIsCartOpen} = useCart();
     const [searchQuery, setSearchQuery] = useState("")
     const [userMenuOpen, setUserMenuOpen] = useState(false)
@@ -20,6 +21,7 @@ const Navbar = () => {
     }
 
     const handleLogout = () => {
+        logout();
         setUserMenuOpen(false)
         navigate("/")
     }
@@ -116,7 +118,7 @@ const Navbar = () => {
                                                 Deals
                                             </Link>
                                         {user?.isAdmin && (
-                                            <Link to="/addradmin/products" className="dropdown-link">
+                                            <Link to="/admin/products" className="dropdown-link">
                                             <ShieldIcon size={16} className="text-app-orange-dark"/> 
                                                 <span className="text-app-orange-dark">Admin Panel</span>
                                             </Link>
