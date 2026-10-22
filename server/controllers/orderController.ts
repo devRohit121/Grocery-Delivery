@@ -69,8 +69,8 @@ export const createOrder = async(req: Request, res: Response) => {
 
         // create session
         const session = await stripe.checkout.sessions.create({
-        success_url: '${req.headers.origin}/orders?clearCart=true',
-        cancel_url: '${req.headers.origin}/checkout',
+        success_url: `${req.headers.origin}/orders?clearCart=true`,
+        cancel_url: `${req.headers.origin}/checkout`,
         line_items: [
             {
             price_data: {
@@ -78,7 +78,7 @@ export const createOrder = async(req: Request, res: Response) => {
                 product_data: {
                     name: "Payment Groceries"
                 },
-                unit_amount: Math.round(total * 100);
+                unit_amount: Math.round(total * 100)
             },
             quantity: 1,
             },
@@ -91,8 +91,7 @@ export const createOrder = async(req: Request, res: Response) => {
 
     }
 
-    res.json({order})
-
+    
     // Decrease stock
     for (const item of orderItems) {
         await prisma.product.update({
@@ -100,13 +99,15 @@ export const createOrder = async(req: Request, res: Response) => {
             data: {stock: {decrement: item.quantity}}
         })
     }
-
+    
     // send stock update events for each product in the order
     for (const item of orderItems) {
         await inngest.send({name: "inventory/stock.updated", data: {productId: item.product}})
     }
-
+    
     await inngest.send({name: "order/placed", data: {orderId: order.id}})
+
+    res.json({order})
 }
 
 
