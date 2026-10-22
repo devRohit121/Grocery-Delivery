@@ -3,7 +3,14 @@ import Stripe from 'stripe';
 import { prisma } from "../config/prisma.js";
 import { inngest } from "../inngest/index.js";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+
+if (!stripeSecretKey) {
+    throw new Error("STRIPE_SECRET_KEY is missing from environment variables");
+}
+
+const stripe = new Stripe(stripeSecretKey);
+
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export const stripeWebhook = async (request: Request, response: Response) => {
