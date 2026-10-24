@@ -58,7 +58,7 @@ const AddressCard = ({addr, onEditHandler, setAddresses} : AddressCardProps) => 
 
         <div className="flex items-center gap-1">
             <button onClick={() => onEditHandler(addr)}
-            className="p-2 text-app-text-light hover:text-app-green hover: bg-app-cream rounded-lg transition-colors">
+            className="p-2 text-app-text-light hover:text-app-green hover:bg-app-cream rounded-lg transition-colors">
                 <PencilIcon className="size-4"/>
             </button>
 
